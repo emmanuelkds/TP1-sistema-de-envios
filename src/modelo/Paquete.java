@@ -2,38 +2,44 @@ package modelo;
 
 public class Paquete {
     private String Id;
-    private String descripcion; 
-    private double peso;    
+    private String descripcion;
+    private double peso;
     private EstadoPaquete estadoPaquete;
-    
-    //Constructor de estado minimo
+
+    // CONSTRUCTOR BASICO, SI NO SE PROPORCIONA UNA DESCRIPCION, SE ASIGNA "Sin
+    // descripcion" POR DEFECTO. EL ESTADO INICIAL DEL PAQUETE ES RECIBIDO.
     public Paquete(String Id, double peso) {
         this.Id = Id;
         this.descripcion = "Sin descripcion";
         this.peso = peso;
         this.estadoPaquete = EstadoPaquete.RECIBIDO;
     }
-    //Constructor completo
+
+    // CONSTRUCTOR COMPLETO, PERMITE ASIGNAR UNA DESCRIPCION PERSONALIZADA AL
+    // PAQUETE. EL ESTADO INICIAL DEL PAQUETE ES RECIBIDO.
     public Paquete(String Id, String descripcion, double peso) {
         this.Id = Id;
         this.descripcion = descripcion;
         this.peso = peso;
         this.estadoPaquete = EstadoPaquete.RECIBIDO;
     }
-    //Si esta en estado recibido, se puede preparar
-    public void preparar () {
+
+    // SI ESTA EN ESTADO RECIBIDO, SE PUEDE PREPARAR PARA SU DISTRIBUCION
+    public void preparar() {
         if (estadoPaquete == EstadoPaquete.RECIBIDO) {
             estadoPaquete = EstadoPaquete.EN_PREPARACION;
         }
     }
-    //Si esta en estado preparado, se puede distribuir
-    public void distribuir () {
+
+    // SI ESTA EN ESTADO PREPARADO, SE PUEDE DISTRIBUIR
+    public void distribuir() {
         if (estadoPaquete == EstadoPaquete.EN_PREPARACION) {
             estadoPaquete = EstadoPaquete.EN_DISTRIBUCION;
         }
     }
-    //Si esta en estado distribuido, se puede entregar
-    public void entregar () {
+
+    // SI ESTA EN ESTADO DISTRIBUIDO, SE PUEDE ENTREGAR
+    public void entregar() {
         if (estadoPaquete == EstadoPaquete.EN_DISTRIBUCION) {
             estadoPaquete = EstadoPaquete.ENTREGADO;
         }
@@ -42,8 +48,9 @@ public class Paquete {
     public double getPeso() {
         return peso;
     }
- 
-    //Metodo toString para mostrar la informacion del paquete
+
+    // METODO TO STRING PARA REPRESENTAR EL PAQUETE, INCLUYENDO SU ID, DESCRIPCION,
+    // PESO Y ESTADO ACTUAL.
     public String toString() {
         return "Paquete [Id=" + Id + ", descripcion=" + descripcion + ", peso=" + peso + ", estadoPaquete="
                 + estadoPaquete + "]";

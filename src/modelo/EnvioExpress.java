@@ -1,10 +1,13 @@
 package modelo;
 
 public class EnvioExpress extends Envio {
-    public EnvioExpress(String id) {
-        super(id);
+    public EnvioExpress(String id, Cliente cliente) {
+        super(id, cliente);
     }
-   //Se sobreescribe el método calcularCosto para aplicar un costo adicional del 50% al costo base de cada paquete.
+
+    // SE SOBREESCRIBE EL METODO CALCULARCOSTO PARA APLICAR UN COSTO ADICIONAL DEL
+    // 50% AL COSTO BASE DEL ENVIO, QUE SE CALCULA MULTIPLICANDO EL PESO DE CADA
+    // PAQUETE POR 100.
     @Override
     public double calcularCosto() {
         double costo = 0;
