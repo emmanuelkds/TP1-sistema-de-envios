@@ -21,26 +21,33 @@ public class Sucursal {
 
     public void recibirEnvio(Envio envio) {
         envio.recibir(this);
-        System.out.println("Envio recibido en la sucursal " + localidad);
         enviosEnSucursal.add(envio);
     }
 
     public void despacharEnvio(Envio envio) {
         if (!enviosEnSucursal.contains(envio)) {
-            throw new IllegalStateException("El envio " + envio + " no se encuentra en la sucursal " + localidad);
+            throw new EnvioInexistenteException(
+                    "El envio " + envio.getId() + " no se encuentra en la sucursal " + localidad + ".");
         }
         envio.despachar(this);
-        System.out.println("Envio despachado desde la sucursal " + localidad);
         enviosEnSucursal.remove(envio);
     }
 
     public void entregarEnvio(Envio envio) {
         if (!enviosEnSucursal.contains(envio)) {
-            throw new IllegalStateException("El envio " + envio + " no se encuentra en la sucursal " + localidad);
+            throw new EnvioInexistenteException(
+                    "El envio " + envio.getId() + " no se encuentra en la sucursal " + localidad + ".");
         }
         envio.entregar(this);
-        System.out.println("Envio entregado desde la sucursal " + localidad);
         enviosEnSucursal.remove(envio);
+    }
+
+        public String getId() {
+        return id;
+    }
+
+    public String getLocalidad() {
+        return localidad;
     }
 
     public List<Envio> getEnviosEnSucursal() {

@@ -24,25 +24,34 @@ public class Paquete {
         this.estadoPaquete = EstadoPaquete.RECIBIDO;
     }
 
-    // SI ESTA EN ESTADO RECIBIDO, SE PUEDE PREPARAR PARA SU DISTRIBUCION
+    // EL PAQUETE RECIBE MENSAJES DE NEGOCIO, NO CAMBIOS DE ESTADO DIRECTOS.
+    // SI LA TRANSICION NO ES VALIDA, SE LANZA UNA EXCEPCION.
     public void preparar() {
-        if (estadoPaquete == EstadoPaquete.RECIBIDO) {
-            estadoPaquete = EstadoPaquete.EN_PREPARACION;
-        }
+        cambiarEstado(EstadoPaquete.EN_PREPARACION);
     }
 
-    // SI ESTA EN ESTADO PREPARADO, SE PUEDE DISTRIBUIR
     public void distribuir() {
-        if (estadoPaquete == EstadoPaquete.EN_PREPARACION) {
-            estadoPaquete = EstadoPaquete.EN_DISTRIBUCION;
-        }
+        cambiarEstado(EstadoPaquete.EN_DISTRIBUCION);
     }
 
-    // SI ESTA EN ESTADO DISTRIBUIDO, SE PUEDE ENTREGAR
     public void entregar() {
-        if (estadoPaquete == EstadoPaquete.EN_DISTRIBUCION) {
-            estadoPaquete = EstadoPaquete.ENTREGADO;
+        cambiarEstado(EstadoPaquete.ENTREGADO);
+    }
+
+        public EstadoPaquete getEstado() {
+        return estadoPaquete;
+    }
+
+    // METODO PRIVADO AUXILIAR: EL PAQUETE ES EL UNICO RESPONSABLE DE SU ESTADO.
+    // NADIE DE AFUERA PUEDE CAMBIARLO NI NECESITA CONOCER QUE TRANSICIONES SON
+    // VALIDAS; LA REGLA SE LE PREGUNTA AL PROPIO ESTADO.
+    private void cambiarEstado(EstadoPaquete nuevoEstado) {
+        if (!estadoPaquete.puedeAvanzarA(nuevoEstado)) {
+            throw new TransicionInvalidaException("El paquete " + Id + " no puede pasar del estado " + estadoPaquete
+                    + " al estado " + nuevoEstado + ". Estados posibles desde " + estadoPaquete + ": "
+                    + estadoPaquete.getSiguientes() + ".");
         }
+        estadoPaquete = nuevoEstado;
     }
 
     public double getPeso() {

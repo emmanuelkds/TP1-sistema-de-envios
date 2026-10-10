@@ -6,6 +6,9 @@ import modelo.EnvioStandar;
 import modelo.EnvioExpress;
 import modelo.EnvioInternacional;
 import modelo.Sucursal;
+import modelo.Envio;
+import modelo.Movimiento;
+import modelo.OperacionInvalidaException;
 
 public class Main {
 
@@ -105,13 +108,13 @@ public class Main {
         // Este debería mostrar el mensaje de máximo 3
         try {
             envioStandar.agregarPaquete(new Paquete("P006", "Campera", 3));
-        } catch (IllegalStateException e) {
+        } catch (OperacionInvalidaException e) {
             System.out.println(e.getMessage());
         }
 
         try {
             envioStandar.agregarPaquete(new Paquete("P007", "Celular", 1));
-        } catch (IllegalStateException e) {
+        } catch (OperacionInvalidaException e) {
             System.out.println(e.getMessage());
         }
 
@@ -169,9 +172,9 @@ public class Main {
 
         System.out.println("\n--- RECIBIENDO ENVÍOS ---");
 
-        sucursalAllen.recibirEnvio(envioStandar);
-        sucursalAllen.recibirEnvio(envioExpress);
-        sucursalCipolletti.recibirEnvio(envioInternacional);
+        recibir(sucursalAllen, envioStandar);
+        recibir(sucursalAllen, envioExpress);
+        recibir(sucursalCipolletti, envioInternacional);
 
         // ==========================================
         // 10. MOSTRAR ESTADO DE LOS PAQUETES
@@ -184,7 +187,9 @@ public class Main {
         System.out.println(paquete3);
         System.out.println(paquete4);
 
-        sucursalAllen.getEnviosEnSucursal();
+        // EL APP CONSULTA LOS ENVIOS DE LA SUCURSAL Y LOS MUESTRA
+        System.out.println("Envios en la sucursal " + sucursalAllen.getLocalidad() + ": "
+                + sucursalAllen.getEnviosEnSucursal());
 
         // ==========================================
         // 11. DESPACHAR ENVÍOS
@@ -192,9 +197,9 @@ public class Main {
 
         System.out.println("\n--- DESPACHANDO ENVÍOS ---");
 
-        sucursalAllen.despacharEnvio(envioStandar);
-        sucursalAllen.despacharEnvio(envioExpress);
-        sucursalCipolletti.despacharEnvio(envioInternacional);
+        despachar(sucursalAllen, envioStandar);
+        despachar(sucursalAllen, envioExpress);
+        despachar(sucursalCipolletti, envioInternacional);
 
         // ==========================================
         // 12. RECIBIR ENVIO EN OTRA SUCURSAL
@@ -202,12 +207,12 @@ public class Main {
 
         System.out.println("\n--- RECIBIENDO ENVÍOS EN OTRA SUCURSAL ---");
 
-        sucursalCipolletti.recibirEnvio(envioStandar);
-        sucursalCipolletti.recibirEnvio(envioExpress);
-        sucursalNeuquen.recibirEnvio(envioInternacional);
+        recibir(sucursalCipolletti, envioStandar);
+        recibir(sucursalCipolletti, envioExpress);
+        recibir(sucursalNeuquen, envioInternacional);
 
         // ===========================================
-        // 13. MOSTRAR ESTADO DE LOS PAQUETES DESPUÉS DE
+        // 13. MOSTRAR ESTADO DE LOS PAQUETES DESPUÉS DE RECIBIR EN OTRA SUCURSAL.
         // ===========================================
 
         System.out.println("\n--- DESPUÉS DE RECIBIR EN OTRA SUCURSAL ---");
@@ -223,8 +228,8 @@ public class Main {
 
         System.out.println("\n--- DESPACHANDO ENVÍOS EN OTRA SUCURSAL ---");
 
-        sucursalCipolletti.despacharEnvio(envioStandar);
-        sucursalCipolletti.despacharEnvio(envioExpress);
+        despachar(sucursalCipolletti, envioStandar);
+        despachar(sucursalCipolletti, envioExpress);
 
         // ============================================
         // 15. ENTREGAR ENVÍOS EN UNA SUCURSAL
@@ -232,16 +237,16 @@ public class Main {
 
         System.out.println("\n--- ENTREGANDO ENVÍOS EN UNA SUCURSAL ---");
 
-        sucursalNeuquen.entregarEnvio(envioInternacional);
+        entregar(sucursalNeuquen, envioInternacional);
 
         // ==========================================
-        // 16. ENTREGAR ENVÍOS
+        // 16. RECIBIR ENVÍOS EN UNA TERCERA SUCURSAL
         // ==========================================
 
-        System.out.println("\n--- ENTREGANDO ENVÍOS ---");
+        System.out.println("\n--- RECIBIR ENVÍOS EN UNA TERCERA SUCURSAL ---");
 
-        sucursalNeuquen.recibirEnvio(envioStandar);
-        sucursalNeuquen.recibirEnvio(envioExpress);
+        recibir(sucursalNeuquen, envioStandar);
+        recibir(sucursalNeuquen, envioExpress);
 
         // ===========================================
         // 17. ENTREGAR ENVÍOS EN OTRA SUCURSAL
@@ -249,14 +254,15 @@ public class Main {
 
         System.out.println("\n--- ENTREGANDO ENVÍOS EN OTRA SUCURSAL ---");
 
-        sucursalNeuquen.entregarEnvio(envioStandar);
-        sucursalNeuquen.entregarEnvio(envioExpress);
+        entregar(sucursalNeuquen, envioStandar);
+        entregar(sucursalNeuquen, envioExpress);
 
         System.out.println("\n--- HISTORIAL DE MOVIMIENTOS ---");
 
-        envioStandar.mostrarHistorial();
-        envioExpress.mostrarHistorial();
-        envioInternacional.mostrarHistorial();
+        // EL APP PIDE EL HISTORIAL COMO DATO Y ES EL APP QUIEN LO MUESTRA
+        mostrarHistorial(envioStandar);
+        mostrarHistorial(envioExpress);
+        mostrarHistorial(envioInternacional);
 
         System.out.println("\n--- SUCURSALES EN HISTORIAL DE ENVÍOS ---");
 
@@ -280,7 +286,7 @@ public class Main {
         // Intentar despachar un paquete ya entregado
         try {
             envioStandar.despachar(sucursalNeuquen);
-        } catch (IllegalStateException e) {
+        } catch (OperacionInvalidaException e) {
             System.out.println(e.getMessage());
         }
 
@@ -312,8 +318,8 @@ public class Main {
 
         // INTENTAR DESPACHAR EL ENVÍO SIN HABERLO RECIBIDO EN LA SUCURSAL
         try {
-            sucursalAllen.despacharEnvio(envioExtra);
-        } catch (IllegalStateException e) {
+            despachar(sucursalAllen, envioExtra);
+        } catch (OperacionInvalidaException e) {
             System.out.println(e.getMessage());
         }
 
@@ -321,8 +327,8 @@ public class Main {
 
         // RECIBIR EL ENVÍO EN LA SUCURSAL
         try {
-            sucursalAllen.recibirEnvio(envioExtra);
-        } catch (IllegalStateException e) {
+            recibir(sucursalAllen, envioExtra);
+        } catch (OperacionInvalidaException e) {
             System.out.println(e.getMessage());
         }
 
@@ -330,8 +336,8 @@ public class Main {
 
         // INTENTAR RECIBIR EL ENVÍO NUEVAMENTE
         try {
-            sucursalAllen.recibirEnvio(envioExtra);
-        } catch (IllegalStateException e) {
+            recibir(sucursalAllen, envioExtra);
+        } catch (OperacionInvalidaException e) {
             System.out.println(e.getMessage());
         }
 
@@ -339,8 +345,8 @@ public class Main {
 
         // DESPACHAR EL ENVÍO
         try {
-            sucursalAllen.despacharEnvio(envioExtra);
-        } catch (IllegalStateException e) {
+            despachar(sucursalAllen, envioExtra);
+        } catch (OperacionInvalidaException e) {
             System.out.println(e.getMessage());
         }
 
@@ -348,12 +354,54 @@ public class Main {
 
         try {
             envioExtra.agregarPaquete(new Paquete("P006", "Campera", 3));
-        } catch (IllegalStateException e) {
+        } catch (OperacionInvalidaException e) {
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println("\n--- INTENTO DE ENTREGAR UN PAQUETE QUE NO FUE DESPACHADO ---");
+
+        // UN PAQUETE RECIEN CREADO ESTA EN ESTADO RECIBIDO: TODAVIA NO SALIO DE
+        // LA SUCURSAL, POR LO TANTO NO PUEDE ENTREGARSE.
+        Paquete paqueteSinDespachar = new Paquete("P007", "Reloj", 1);
+
+        try {
+            paqueteSinDespachar.entregar();
+        } catch (OperacionInvalidaException e) {
             System.out.println(e.getMessage());
         }
 
         System.out.println("\n======================================");
         System.out.println("       FIN DE LA PRUEBA");
         System.out.println("======================================");
+    }
+
+    // EL APP ES EL UNICO RESPONSABLE DE IMPRIMIR EN CONSOLA: LE PIDE EL DATO AL
+    // ENVIO Y LO RECORRE. EL ENVIO NO SABE NADA DE LA CONSOLA.
+    private static void mostrarHistorial(Envio envio) {
+        System.out.println("Historial de movimientos del envio " + envio.getId() + ":");
+        for (Movimiento movimiento : envio.getHistorial()) {
+            System.out.println(movimiento);
+        }
+    }
+
+    // ==================================================================
+    // METODOS DEL APP
+    // EL APP OPERA A TRAVES DE LAS SUCURSALES Y DESPUES MUESTRA EL
+    // RESULTADO CON LOS DATOS QUE LE DEVUELVEN LOS OBJETOS DEL MODELO.
+    // ==================================================================
+
+    private static void recibir(Sucursal sucursal, Envio envio) {
+        sucursal.recibirEnvio(envio);
+        System.out.println("Envio " + envio.getId() + " recibido en la sucursal " + sucursal.getLocalidad() + ".");
+    }
+
+    private static void despachar(Sucursal sucursal, Envio envio) {
+        sucursal.despacharEnvio(envio);
+        System.out.println("Envio " + envio.getId() + " despachado desde la sucursal " + sucursal.getLocalidad() + ".");
+    }
+
+    private static void entregar(Sucursal sucursal, Envio envio) {
+        sucursal.entregarEnvio(envio);
+        System.out.println("Envio " + envio.getId() + " entregado en la sucursal " + sucursal.getLocalidad() + ".");
     }
 }
