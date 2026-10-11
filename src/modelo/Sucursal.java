@@ -42,7 +42,20 @@ public class Sucursal {
         enviosEnSucursal.remove(envio);
     }
 
-        public String getId() {
+    // OPERACION DE BUSQUEDA POR CODIGO: LA SUCURSAL ES LA QUE CONOCE LOS ENVIOS
+    // QUE TIENE EN CUSTODIA, ASI QUE ES ELLA LA QUE RESPONDE SI EL ENVIO BUSCADO
+    // ESTA O NO ESTA EN ELLA.
+    public Envio buscarEnvio(String idEnvio) {
+        for (Envio envio : enviosEnSucursal) {
+            if (envio.getId().equalsIgnoreCase(idEnvio)) {
+                return envio;
+            }
+        }
+        throw new EnvioInexistenteException(
+                "No se encontró ningún envío con el código " + idEnvio + " en la sucursal " + localidad + ".");
+    }
+
+    public String getId() {
         return id;
     }
 

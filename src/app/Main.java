@@ -2,8 +2,10 @@ package app;
 
 import modelo.Cliente;
 import modelo.Paquete;
+import modelo.RedDeSucursales;
 import modelo.EnvioStandar;
 import modelo.EnvioExpress;
+import modelo.EnvioInexistenteException;
 import modelo.EnvioInternacional;
 import modelo.Sucursal;
 import modelo.Envio;
@@ -191,6 +193,20 @@ public class Main {
         System.out.println("Envios en la sucursal " + sucursalAllen.getLocalidad() + ": "
                 + sucursalAllen.getEnviosEnSucursal());
 
+        // ==========================================
+        // 10.1 BUSQUEDA POR ID
+        // ==========================================
+
+        System.out.println("\n--- BUSQUEDA POR ID ---");
+
+        RedDeSucursales red = new RedDeSucursales();
+        red.agregarSucursal(sucursalAllen);
+        red.agregarSucursal(sucursalCipolletti);
+        red.agregarSucursal(sucursalNeuquen);
+
+        System.out.println("\n--- BUSCAR ENVÍO POR CÓDIGO ---");
+        buscar(red, "E001");
+        buscar(red, "E999");
         // ==========================================
         // 11. DESPACHAR ENVÍOS
         // ==========================================
@@ -403,5 +419,21 @@ public class Main {
     private static void entregar(Sucursal sucursal, Envio envio) {
         sucursal.entregarEnvio(envio);
         System.out.println("Envio " + envio.getId() + " entregado en la sucursal " + sucursal.getLocalidad() + ".");
+    }
+
+    // EL APP PIDE LA BUSQUEDA Y MUESTRA EL RESULTADO: NO RECORRE SUCURSALES,
+    // NO CONOCE CUANTAS HAY Y NO MANEJA LAS REGLAS DE CUSTODIA.
+    private static void buscar(RedDeSucursales red, String codigo) {
+        try {
+            Envio envio = red.buscarEnvio(codigo);
+            Movimiento ultimo = envio.getUltimoMovimiento();
+            String estado = (ultimo == null)
+                    ? "sin movimientos"
+                    : ultimo.getTipoMovimiento() + " en " + ultimo.getSucursal().getLocalidad();
+            System.out.println("Envío " + envio.getId() + " | paquetes: " + envio.getPaquetes().size()
+                    + " | último movimiento: " + estado);
+        } catch (EnvioInexistenteException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
