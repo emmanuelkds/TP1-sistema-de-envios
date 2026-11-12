@@ -1,8 +1,8 @@
 package modelo;
 
 public class EnvioExpress extends Envio {
-    public EnvioExpress(String id, Cliente cliente) {
-        super(id, cliente);
+    public EnvioExpress(Cliente cliente) {
+        super(cliente);
     }
 
     // SE SOBREESCRIBE EL METODO CALCULARCOSTO PARA APLICAR UN COSTO ADICIONAL DEL

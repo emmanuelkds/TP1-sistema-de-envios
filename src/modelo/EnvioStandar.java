@@ -1,8 +1,8 @@
 package modelo;
 
 public class EnvioStandar extends Envio {
-    public EnvioStandar(String id, Cliente cliente) {
-        super(id, cliente);
+    public EnvioStandar(Cliente cliente) {
+        super(cliente);
     }
 
     // SE SOBREESCRIBE EL METODO CALCULARCOSTO PARA APLICAR EL COSTO BASE DEL ENVIO,

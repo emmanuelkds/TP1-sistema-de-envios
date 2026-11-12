@@ -6,19 +6,20 @@ import java.util.Collections;
 
 public abstract class Envio {
     private static final int MAXIMO_PAQUETES = 3;
-    private String id;
+    private int id;
     private List<Paquete> paquetes;
     private Cliente cliente;
     private List<Movimiento> movimientosHistorial;
 
+    private static int contadorEnvios = 0;
+
     @SuppressWarnings("this-escape")
-    public Envio(String id, Cliente cliente) {
+    public Envio(Cliente cliente) {
+        contadorEnvios++;
+        this.id = contadorEnvios;
         this.cliente = cliente;
-        this.id = id;
         this.paquetes = new ArrayList<>();
         this.movimientosHistorial = new ArrayList<>();
-        // EL CLIENTE SE REGISTRA A SI MISMO EL ENVIO
-        cliente.agregarEnvio(this);
     }
 
     // AGREGA UN PAQUETE AL ENVIO, SIEMPRE Y CUANDO NO HAYA SIDO RECIBIDO,
@@ -41,18 +42,21 @@ public abstract class Envio {
         return Collections.unmodifiableList(paquetes);
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
     // SE REGISTRA EL MOVIMIENTO DE RECIBIDO EN EL HISTORIAL DEL ENVIO Y SE PREPARAN
     // LOS PAQUETES PARA SU DISTRIBUCION.
-    public void recibir(Sucursal sucursal) {
+    void recibir(Sucursal sucursal) {
         if (!tienePaquetes()) {
             throw new OperacionInvalidaException("El envio " + id + " no puede ser recibido sin paquetes.");
         }
         if (!estaEnEtapaDeRecepcion()) {
             throw new TransicionInvalidaException("El envio " + id + " no se puede recibir en este momento.");
+        }
+        if (getUltimaEtapa() == null) {
+            cliente.agregarEnvio(this);
         }
         for (Paquete paquete : paquetes) {
             paquete.preparar();
@@ -60,7 +64,7 @@ public abstract class Envio {
         registrarMovimiento(TipoMovimiento.RECIBIDO, sucursal);
     }
 
-    public void despachar(Sucursal sucursal) {
+    void despachar(Sucursal sucursal) {
         if (!puedeDespacharse()) {
             throw new TransicionInvalidaException("El envio " + id + " no puede ser despachado.");
         }
@@ -73,7 +77,7 @@ public abstract class Envio {
     // ENTREGA EL ENVIO, SIEMPRE Y CUANDO HAYA SIDO RECIBIDO Y NO HAYA SIDO
     // ENTREGADO ANTES. SE REGISTRA EL MOVIMIENTO DE ENTREGADO EN EL HISTORIAL DEL
     // ENVIO.
-    public void entregar(Sucursal sucursal) {
+    void entregar(Sucursal sucursal) {
         if (!puedeEntregarse()) {
             throw new TransicionInvalidaException("El envio " + id + " no puede ser entregado.");
         }

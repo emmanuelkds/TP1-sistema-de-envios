@@ -1,8 +1,8 @@
 package modelo;
 
 public class EnvioInternacional extends Envio {
-    public EnvioInternacional(String id, Cliente cliente) {
-        super(id, cliente);
+    public EnvioInternacional(Cliente cliente) {
+        super(cliente);
     }
 
     // SE SOBREESCRIBE EL METODO CALCULARCOSTO PARA APLICAR UN COSTO ADICIONAL DEL

@@ -1,11 +1,10 @@
 package modelo;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Sucursal {
-    private List<Envio> enviosEnSucursal;
+    private Queue<Envio> colaDeDespacho; // CAMBIO: Ahora es una cola FIFO
     private String id;
     private String localidad;
     private String direccion;
@@ -16,43 +15,54 @@ public class Sucursal {
         this.localidad = localidad;
         this.direccion = direccion;
         this.telefono = telefono;
-        this.enviosEnSucursal = new ArrayList<>();
+        this.colaDeDespacho = new LinkedList<>(); // LinkedList implementa Queue
     }
 
+    // El envío entra al final de la cola
     public void recibirEnvio(Envio envio) {
         envio.recibir(this);
-        enviosEnSucursal.add(envio);
+        colaDeDespacho.add(envio);
     }
 
-    public void despacharEnvio(Envio envio) {
-        if (!enviosEnSucursal.contains(envio)) {
-            throw new EnvioInexistenteException(
-                    "El envio " + envio.getId() + " no se encuentra en la sucursal " + localidad + ".");
+    // Despachar una cantidad de envíos respetando el orden FIFO
+    public void despachar(int cantidad) {
+        if (colaDeDespacho.isEmpty()) {
+            System.out.println("La cola de despacho de " + localidad + " está vacía. No hay envíos para despachar.");
+            return;
         }
-        envio.despachar(this);
-        enviosEnSucursal.remove(envio);
+
+        int despachados = 0;
+
+        while (!colaDeDespacho.isEmpty() && despachados < cantidad) {
+            Envio envio = colaDeDespacho.poll(); // Saca el primero (el que llegó primero)
+            envio.despachar(this);
+            System.out.println("Envío " + envio.getId() + " despachado desde " + localidad + ".");
+            despachados++;
+        }
+
+        if (despachados < cantidad) {
+            System.out.println("Se despacharon " + despachados + " envíos. La cola quedó vacía.");
+        }
     }
 
+    // Para entregar, el envío tiene que estar en la cola (fue recibido y no despachado)
     public void entregarEnvio(Envio envio) {
-        if (!enviosEnSucursal.contains(envio)) {
+        if (!colaDeDespacho.contains(envio)) {
             throw new EnvioInexistenteException(
-                    "El envio " + envio.getId() + " no se encuentra en la sucursal " + localidad + ".");
+                    "El envío " + envio.getId() + " no se encuentra en la sucursal " + localidad + ".");
         }
         envio.entregar(this);
-        enviosEnSucursal.remove(envio);
+        colaDeDespacho.remove(envio);
     }
 
-    // OPERACION DE BUSQUEDA POR CODIGO: LA SUCURSAL ES LA QUE CONOCE LOS ENVIOS
-    // QUE TIENE EN CUSTODIA, ASI QUE ES ELLA LA QUE RESPONDE SI EL ENVIO BUSCADO
-    // ESTA O NO ESTA EN ELLA.
-    public Envio buscarEnvio(String idEnvio) {
-        for (Envio envio : enviosEnSucursal) {
-            if (envio.getId().equalsIgnoreCase(idEnvio)) {
-                return envio;
-            }
-        }
-        throw new EnvioInexistenteException(
-                "No se encontró ningún envío con el código " + idEnvio + " en la sucursal " + localidad + ".");
+    // Para que el Main consulte cuántos envíos hay en espera
+    public int cantidadEnviosEnEspera() {
+        return colaDeDespacho.size();
+    }
+
+    // Para que el Main verifique si hay envíos (opcional)
+    public boolean tieneEnvios() {
+        return !colaDeDespacho.isEmpty();
     }
 
     public String getId() {
@@ -63,12 +73,8 @@ public class Sucursal {
         return localidad;
     }
 
-    public List<Envio> getEnviosEnSucursal() {
-        return Collections.unmodifiableList(enviosEnSucursal);
-    }
-
     public String toString() {
         return "Sucursal [id=" + id + ", localidad=" + localidad + ", direccion=" + direccion
-                + ", telefono=" + telefono + "]";
+                + ", telefono=" + telefono + ", envíos en espera=" + colaDeDespacho.size() + "]";
     }
 }
